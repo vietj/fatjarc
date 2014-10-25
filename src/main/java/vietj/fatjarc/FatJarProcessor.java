@@ -5,9 +5,6 @@ import com.sun.source.tree.ImportTree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
-import com.sun.source.util.Trees;
-import com.sun.tools.javac.processing.JavacProcessingEnvironment;
-import com.sun.tools.javac.util.Context;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassReader;
@@ -26,9 +23,11 @@ import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Collections;
@@ -45,21 +44,14 @@ import java.util.jar.JarFile;
 @SupportedAnnotationTypes("*")
 public class FatJarProcessor extends AbstractProcessor implements TaskListener {
 
-  private Trees trees;
   private final Set<URL> pendingJars = new HashSet<>();
   private final Set<URL> processedJars = new HashSet<>();
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
-
-    Context context = ((JavacProcessingEnvironment) processingEnv).getContext();
-    trees = Trees.instance(processingEnv);
-
     JavacTask task = JavacTask.instance(processingEnv);
     task.addTaskListener(this);
-
-
   }
 
   @Override
@@ -99,6 +91,23 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
     return true;
   }
 
+  private static Field outField;
+
+  private static OutputStream getMostEfficientOutputStream(OutputStream abc) {
+    if (abc instanceof FilterOutputStream) {
+      // FilterOutputStream is a real performance hog
+      try {
+        if (outField == null) {
+          outField = FilterOutputStream.class.getDeclaredField("out");
+          outField.setAccessible(true);
+        }
+        return (OutputStream) outField.get(abc);
+      } catch (Exception ignore) {
+      }
+    }
+    return abc;
+  }
+
   private void writePendingJars() {
     byte[] buffer = new byte[4096];
     HashMap<String, FileObject> using = new HashMap<>();
@@ -116,7 +125,7 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
               if (!using.containsKey(resourceName)) {
                 FileObject resource = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", resourceName);
                 using.put(resourceName, resource);
-                try (OutputStream out = new BufferedOutputStream(resource.openOutputStream())) {
+                try (OutputStream out = new BufferedOutputStream(getMostEfficientOutputStream(resource.openOutputStream()))) {
                   while (true) {
                     int read = in.read(buffer);
                     if (read == -1) {
