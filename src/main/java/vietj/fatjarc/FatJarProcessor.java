@@ -1,10 +1,14 @@
 package vietj.fatjarc;
 
-import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ImportTree;
+import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.TreeVisitor;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
+import com.sun.source.util.TreeScanner;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassReader;
@@ -60,12 +64,32 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
 
   @Override
   public void finished(TaskEvent e) {
+
+    if (e.getKind() == TaskEvent.Kind.ANALYZE) {
+      TreeVisitor<Void, Void> visitor = new TreeScanner<Void, Void>() {
+
+        @Override
+        public Void visitImport(ImportTree node, Void v) {
+          String fqn = node.getQualifiedIdentifier().toString();
+          readFqn(fqn);
+          return v;
+        }
+
+        @Override
+        public Void visitVariable(VariableTree node, Void v) {
+          Tree type = node.getType();
+          if (type instanceof MemberSelectTree) {
+            String fqn = type.toString();
+            readFqn(fqn);
+          }
+          return super.visitVariable(node, v);
+        }
+      };
+
+      e.getCompilationUnit().accept(visitor, null);
+    }
+
     if (e.getKind() == TaskEvent.Kind.GENERATE) {
-      CompilationUnitTree unit = e.getCompilationUnit();
-      for (ImportTree importTree : unit.getImports()) {
-        String fqn = importTree.getQualifiedIdentifier().toString();
-        readFqn(fqn);
-      }
       writePendingJars();
     }
   }

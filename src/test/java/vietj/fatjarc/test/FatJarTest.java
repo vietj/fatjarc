@@ -1,5 +1,6 @@
 package vietj.fatjarc.test;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import vietj.fatjarc.FatJarProcessor;
 
@@ -10,16 +11,29 @@ import java.io.File;
  */
 public class FatJarTest extends TestBase {
 
-  @Test
-  public void testSimple() throws Exception {
-    File test1Classes = new File("target/simple/test1");
-    compiler(test1Classes).assertCompile("test1/A.java");
-    File test1Jar = new File("target/simple-test1.jar");
-    makeJar(test1Classes.getAbsoluteFile(), test1Jar);
-    File test2Classes = new File("target/simple/test2");
-    compiler(test2Classes).addToClassPath(test1Jar).addProcessor(new FatJarProcessor()).assertCompile("test2/B.java");
-    assertFile(new File(test2Classes, "test2/B.class"));
-    assertFile(new File(test2Classes, "test1/A.class"));
+  private static File basicJar;
+
+  @BeforeClass
+  public static void compileBasic() throws Exception {
+    File basicClasses = new File("target/basic");
+    compiler(basicClasses).assertCompile("basic/Foo.java");
+    basicJar = new File("target/basic.jar");
+    makeJar(basicClasses.getAbsoluteFile(), basicJar);
   }
 
+  @Test
+  public void testFqnImport() throws Exception {
+    File classes = new File("target/fqnimport/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("fqnimport/Bar.java");
+    assertFile(new File(classes, "fqnimport/Bar.class"));
+    assertFile(new File(classes, "basic/Foo.class"));
+  }
+
+  @Test
+  public void testFullyQualifiedVariable() throws Exception {
+    File classes = new File("target/fqnvariable/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("fqnvariable/Bar.java");
+    assertFile(new File(classes, "fqnvariable/Bar.class"));
+    assertFile(new File(classes, "basic/Foo.class"));
+  }
 }
