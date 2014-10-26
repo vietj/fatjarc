@@ -60,4 +60,12 @@ public class FatJarTest extends TestBase {
     assertFile(new File(classes, "qualifiedmethodparameter/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
+
+  @Test
+  public void testUnqualifiedMethodReturn() throws Exception {
+    File classes = new File("target/unqualifiedmethodreturn/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("unqualifiedmethodreturn/Bar.java");
+    assertFile(new File(classes, "unqualifiedmethodreturn/Bar.class"));
+    assertFile(new File(classes, "basic/Foo.class"));
+  }
 }

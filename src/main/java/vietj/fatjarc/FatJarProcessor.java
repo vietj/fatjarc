@@ -314,6 +314,7 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
       while (ss.charAt(j) != ')') {
         j = readDescriptor(ss, j, names);
       }
+      readDescriptor(ss, j + 1, names);
       readAttributes(in);
     }
 
