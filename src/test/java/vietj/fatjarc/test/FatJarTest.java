@@ -92,4 +92,20 @@ public class FatJarTest extends TestBase {
     assertFile(new File(classes, "qualifiedconstructorparameter/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
+
+  @Test
+  public void testQualifiedArgumentOfParameterizedMethodParameter() throws Exception {
+    File classes = new File("target/argumentofparameterizedmethodparameter/qualified/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("argumentofparameterizedmethodparameter/qualified/Bar.java");
+    assertFile(new File(classes, "argumentofparameterizedmethodparameter/qualified/Bar.class"));
+    assertFile(new File(classes, "basic/Foo.class"));
+  }
+
+  @Test
+  public void testUnqualifiedArgumentOfParameterizedMethodParameter() throws Exception {
+    File classes = new File("target/argumentofparameterizedmethodparameter/unqualified/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("argumentofparameterizedmethodparameter/unqualified/Bar.java");
+    assertFile(new File(classes, "argumentofparameterizedmethodparameter/unqualified/Bar.class"));
+    assertFile(new File(classes, "basic/Foo.class"));
+  }
 }

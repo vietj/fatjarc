@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -302,7 +303,9 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
       in.readUnsignedShort(); // name_index
       int descriptor_index = in.readUnsignedShort(); // descriptor_index
       readDescriptor(strings[descriptor_index], 0, names);
-      readAttributes(in);
+      readAttributes(strings, in, s -> {
+        throw new UnsupportedOperationException("todo");
+      });
     }
     int methods_count = in.readUnsignedShort(); // methods_count
     for (int i = 0;i < methods_count;i++) {
@@ -315,23 +318,30 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
         j = readDescriptor(ss, j, names);
       }
       readDescriptor(ss, j + 1, names);
-      readAttributes(in);
+      readAttributes(strings, in, signature -> SignatureParser.parseMethodTypeSignature(signature, names));
     }
 
     //
     return names;
   }
 
-  private static void readAttributes(DataInputStream in) throws IOException {
+  private static void readAttributes(String[] strings, DataInputStream in, Consumer<String> signatureParser) throws IOException {
     int attributes_count = in.readUnsignedShort(); // attributes_count
     for (int j = 0;j < attributes_count;j++) {
-      in.readUnsignedShort(); // attribute_name_index
+      int attribute_name_index = in.readUnsignedShort(); // attribute_name_index
       int attribute_length = in.readInt(); // attribute_length
-      while (attribute_length > 0) {
-        if (in.read() == -1) {
-          throw new AssertionError();
-        } else {
-          attribute_length--;
+      String attribute = strings[attribute_name_index];
+      if (attribute.equals("Signature")) {
+        int signature_index = in.readUnsignedShort();
+        String signature = strings[signature_index];
+        signatureParser.accept(signature);
+      } else {
+        while (attribute_length > 0) {
+          if (in.read() == -1) {
+            throw new AssertionError();
+          } else {
+            attribute_length--;
+          }
         }
       }
     }
