@@ -1,4 +1,4 @@
-package fqnvariable;
+package qualifiedfield;
 
 public class Bar {
 

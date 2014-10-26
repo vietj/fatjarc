@@ -22,18 +22,34 @@ public class FatJarTest extends TestBase {
   }
 
   @Test
-  public void testFqnImport() throws Exception {
-    File classes = new File("target/fqnimport/classes");
-    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("fqnimport/Bar.java");
-    assertFile(new File(classes, "fqnimport/Bar.class"));
+  public void testUnqualifiedField() throws Exception {
+    File classes = new File("target/unqualifiedfield/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("unqualifiedfield/Bar.java");
+    assertFile(new File(classes, "unqualifiedfield/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
 
   @Test
-  public void testFullyQualifiedVariable() throws Exception {
-    File classes = new File("target/fqnvariable/classes");
-    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("fqnvariable/Bar.java");
-    assertFile(new File(classes, "fqnvariable/Bar.class"));
+  public void testQualifiedField() throws Exception {
+    File classes = new File("target/qualifiedfield/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("qualifiedfield/Bar.java");
+    assertFile(new File(classes, "qualifiedfield/Bar.class"));
+    assertFile(new File(classes, "basic/Foo.class"));
+  }
+
+  @Test
+  public void testClassLiteral() throws Exception {
+    File classes = new File("target/classliteral/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("classliteral/Bar.java");
+    assertFile(new File(classes, "classliteral/Bar.class"));
+    assertFile(new File(classes, "basic/Foo.class"));
+  }
+
+  @Test
+  public void testUnqualifiedMethodParameter() throws Exception {
+    File classes = new File("target/unqualifiedmethodparameter/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("unqualifiedmethodparameter/Bar.java");
+    assertFile(new File(classes, "unqualifiedmethodparameter/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
 }

@@ -1,4 +1,4 @@
-package fqnimport;
+package unqualifiedfield;
 
 import basic.Foo;
 

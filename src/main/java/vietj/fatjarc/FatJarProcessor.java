@@ -1,5 +1,6 @@
 package vietj.fatjarc;
 
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.Tree;
@@ -27,6 +28,7 @@ import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,10 +36,12 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -65,31 +69,28 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
   @Override
   public void finished(TaskEvent e) {
 
-    if (e.getKind() == TaskEvent.Kind.ANALYZE) {
+    if (e.getKind() == TaskEvent.Kind.GENERATE) {
+
       TreeVisitor<Void, Void> visitor = new TreeScanner<Void, Void>() {
-
         @Override
-        public Void visitImport(ImportTree node, Void v) {
-          String fqn = node.getQualifiedIdentifier().toString();
-          readFqn(fqn);
-          return v;
-        }
+        public Void visitClass(ClassTree node, Void v) {
 
-        @Override
-        public Void visitVariable(VariableTree node, Void v) {
-          Tree type = node.getType();
-          if (type instanceof MemberSelectTree) {
-            String fqn = type.toString();
-            readFqn(fqn);
+          String simpleName = node.getSimpleName().toString();
+          try {
+            FileObject o = processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT,
+                e.getCompilationUnit().getPackageName().toString(),
+                simpleName + ".class");
+            readClassFile(o.openInputStream());
+          } catch (IOException e1) {
+            e1.printStackTrace();
           }
-          return super.visitVariable(node, v);
+
+          return super.visitClass(node, v);
         }
       };
 
       e.getCompilationUnit().accept(visitor, null);
-    }
 
-    if (e.getKind() == TaskEvent.Kind.GENERATE) {
       writePendingJars();
     }
   }
@@ -193,81 +194,9 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
           JarFile file = conn.getJarFile();
           for (JarEntry entry : Collections.list(file.entries())) {
             if (!entry.isDirectory()) {
-
-              //
               if (entry.getName().endsWith(".class")) {
                 try(InputStream in = file.getInputStream(entry)) {
-                  ClassReader reader = new ClassReader(in);
-                  reader.accept(new ClassVisitor(Opcodes.ASM5) {
-
-                    int onType(String typeDesc, int from) {
-                      switch (typeDesc.charAt(from)) {
-                        case 'L': {
-                          int to = typeDesc.indexOf(';', from);
-                          String fqn = typeDesc.substring(from + 1, to).replace('/', '.');
-                          readFqn(fqn);
-                          return to + 1;
-                        }
-                        case '[': {
-                          return onType(typeDesc, from + 1);
-                        }
-                        default:
-                          return from + 1;
-                      }
-                    }
-
-                    @Override
-                    public void visit(int i, int i2, String s, String s2, String s3, String[] strings) {
-                    }
-                    @Override
-                    public void visitSource(String s, String s2) {
-                    }
-                    @Override
-                    public void visitOuterClass(String s, String s2, String s3) {
-                    }
-                    @Override
-                    public AnnotationVisitor visitAnnotation(String s, boolean b) {
-                      onType(s, 0);
-                      return new AnnotationVisitor(Opcodes.ASM5) {
-                        @Override
-                        public void visit(String name, Object value) {
-                          if (value instanceof Type) {
-                            Type type = (Type) value;
-                            // ? Handler this
-                          }
-                        }
-
-                        @Override
-                        public AnnotationVisitor visitAnnotation(String name, String desc) {
-                          onType(s, 0);
-                          return this;
-                        }
-                      };
-                    }
-                    @Override
-                    public void visitAttribute(Attribute attribute) {
-                    }
-                    @Override
-                    public void visitInnerClass(String s, String s2, String s3, int i) {
-                    }
-                    @Override
-                    public FieldVisitor visitField(int i, String s, String s2, String s3, Object o) {
-                      onType(s2, 0);
-                      return null;
-                    }
-                    @Override
-                    public MethodVisitor visitMethod(int i, String s, String s2, String s3, String[] strings) {
-                      int index = 1;
-                      while (s2.charAt(index) != ')') {
-                        index = onType(s2, index);
-                      }
-                      onType(s2, index + 1);
-                      return null;
-                    }
-                    @Override
-                    public void visitEnd() {
-                    }
-                  }, 0);
+                  readClassFile(in);
                 }
               }
             }
@@ -278,4 +207,141 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
       e.printStackTrace();
     }
   }
+
+  private void readClassFile(InputStream in) throws IOException {
+    List<String> ss = foo(in);
+    for (String s : ss) {
+      onType(s, 0);
+    }
+  }
+
+  int onType(String typeDesc, int from) {
+    switch (typeDesc.charAt(from)) {
+      case 'L': {
+        int to = typeDesc.indexOf(';', from);
+        String fqn = typeDesc.substring(from + 1, to).replace('/', '.');
+        readFqn(fqn);
+        return to + 1;
+      }
+      case '[': {
+        return onType(typeDesc, from + 1);
+      }
+      default:
+        return from + 1;
+    }
+  }
+
+  static List<String> foo(InputStream _in) throws IOException {
+
+    List<String> ret = new ArrayList<>();
+
+
+    DataInputStream in = new DataInputStream(_in);
+    in.readInt(); // 0xCAFEBABE
+    int minor = in.readUnsignedShort();
+    int major = in.readUnsignedShort();
+    int constantPoolCount = in.readUnsignedShort();
+    String[] strings = new String[constantPoolCount];
+    List<Integer> refs = new ArrayList<>();
+    for (int i = 1;i < constantPoolCount;i++) {
+      int tag = in.readUnsignedByte();
+      switch (tag) {
+        case 1:  // String
+          int len = in.readUnsignedShort();
+          byte[] data = new byte[len];
+          int index = 0;
+          while (index < len) {
+            int a = in.read(data, index, data.length - index);
+            if (a == -1) {
+              throw new AssertionError("bug");
+            } else {
+              index += a;
+            }
+          }
+          strings[i] = new String(data);
+          break;
+        case 3:  // Integer
+        case 4:  // Float
+          in.readInt();
+          break;
+        case 5: //  Long
+        case 6: //  Double
+          in.readLong();
+          i++;
+          break;
+        case 7:  // Class reference
+          refs.add(in.readUnsignedShort());
+          break;
+        case 8:  // String reference
+          in.readShort();;
+          break;
+        case 9:  // Field reference
+          in.readShort();
+          in.readShort();
+          break;
+        case 10: // Method reference
+        case 11: // Interface method reference
+          in.readInt();
+          break;
+        case 12: // Name and type descriptor
+          in.readShort();
+          in.readShort();
+          break;
+        case 0:
+          break;
+        default:
+          throw new UnsupportedOperationException("Todo " + tag);
+      }
+    }
+    for (int classReference : refs) {
+      String ref = strings[classReference];
+      if (ref.charAt(0) == '[') {
+        ret.add(ref);
+      } else {
+        ret.add("L" + ref + ";");
+      }
+    }
+    in.readUnsignedShort(); // access_flags
+    in.readUnsignedShort(); // this_class
+    in.readUnsignedShort(); // super_class
+    int interfaces_count = in.readUnsignedShort(); // interfaces_count
+    for (int i = 0;i < interfaces_count;i++) {
+      in.readUnsignedShort(); // interfaces[]
+    }
+    int fields_count = in.readUnsignedShort(); // fields_count
+    for (int i = 0;i < fields_count;i++) {
+      in.readUnsignedShort(); // access_flags
+      in.readUnsignedShort(); // name_index
+      int descriptor_index = in.readUnsignedShort(); // descriptor_index
+      ret.add(strings[descriptor_index]);
+      readAttributes(in);
+    }
+    int methods_count = in.readUnsignedShort(); // methods_count
+    for (int i = 0;i < methods_count;i++) {
+      in.readUnsignedShort(); // access_flags
+      in.readUnsignedShort(); // name_index
+      int descriptor_index = in.readUnsignedShort(); // descriptor_index
+      String ss = strings[descriptor_index];
+      readAttributes(in);
+    }
+
+    //
+    return ret;
+  }
+
+  private static void readAttributes(DataInputStream in) throws IOException {
+    int attributes_count = in.readUnsignedShort(); // attributes_count
+    for (int j = 0;j < attributes_count;j++) {
+      in.readUnsignedShort(); // attribute_name_index
+      int attribute_length = in.readInt(); // attribute_length
+      while (attribute_length > 0) {
+        if (in.read() == -1) {
+          throw new AssertionError();
+        } else {
+          attribute_length--;
+        }
+      }
+    }
+  }
+
 }
