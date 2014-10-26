@@ -1,23 +1,11 @@
 package vietj.fatjarc;
 
 import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.ImportTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.Tree;
 import com.sun.source.tree.TreeVisitor;
-import com.sun.source.tree.VariableTree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreeScanner;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -211,20 +199,20 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
   private void readClassFile(InputStream in) throws IOException {
     List<String> ss = foo(in);
     for (String s : ss) {
-      onType(s, 0);
+      readFqn(s);
     }
   }
 
-  int onType(String typeDesc, int from) {
+  static int readDescriptor(String typeDesc, int from, List<String> collector) {
     switch (typeDesc.charAt(from)) {
       case 'L': {
         int to = typeDesc.indexOf(';', from);
         String fqn = typeDesc.substring(from + 1, to).replace('/', '.');
-        readFqn(fqn);
+        collector.add(fqn);
         return to + 1;
       }
       case '[': {
-        return onType(typeDesc, from + 1);
+        return readDescriptor(typeDesc, from + 1, collector);
       }
       default:
         return from + 1;
@@ -233,7 +221,7 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
 
   static List<String> foo(InputStream _in) throws IOException {
 
-    List<String> ret = new ArrayList<>();
+    List<String> names = new ArrayList<>();
 
 
     DataInputStream in = new DataInputStream(_in);
@@ -296,9 +284,9 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
     for (int classReference : refs) {
       String ref = strings[classReference];
       if (ref.charAt(0) == '[') {
-        ret.add(ref);
+        readDescriptor(ref, 0, names);
       } else {
-        ret.add("L" + ref + ";");
+        names.add(ref.replace('/', '.'));
       }
     }
     in.readUnsignedShort(); // access_flags
@@ -313,7 +301,7 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
       in.readUnsignedShort(); // access_flags
       in.readUnsignedShort(); // name_index
       int descriptor_index = in.readUnsignedShort(); // descriptor_index
-      ret.add(strings[descriptor_index]);
+      readDescriptor(strings[descriptor_index], 0, names);
       readAttributes(in);
     }
     int methods_count = in.readUnsignedShort(); // methods_count
@@ -322,11 +310,15 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
       in.readUnsignedShort(); // name_index
       int descriptor_index = in.readUnsignedShort(); // descriptor_index
       String ss = strings[descriptor_index];
+      int j = 1;
+      while (ss.charAt(j) != ')') {
+        j = readDescriptor(ss, j, names);
+      }
       readAttributes(in);
     }
 
     //
-    return ret;
+    return names;
   }
 
   private static void readAttributes(DataInputStream in) throws IOException {
