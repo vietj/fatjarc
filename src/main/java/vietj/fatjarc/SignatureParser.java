@@ -9,7 +9,7 @@ public class SignatureParser {
 
   static int parseMethodTypeSignature(String s, List<String> collector) throws ParseException {
     if (s.startsWith("<")) {
-      throw new UnsupportedOperationException();
+      return parseFormalTypeParameters(0, s, collector);
     } else if (s.startsWith("(")) {
       int index = 1;
       while (s.charAt(index) != ')') {
@@ -19,6 +19,30 @@ public class SignatureParser {
     } else {
       throw new AssertionError("parse error");
     }
+  }
+
+  static int parseFormalTypeParameters(int index, String s, List<String> collector) throws ParseException {
+    if (s.charAt(index++) != '<') {
+      throw new AssertionError("parse error");
+    } else {
+      while (s.charAt(index) != '>') {
+        index = parseFormalTypeParameter(index, s, collector);
+      }
+      return index;
+    }
+  }
+
+  static int parseFormalTypeParameter(int index, String s, List<String> collector) throws ParseException {
+    index = s.indexOf(':', index) + 1;
+    try {
+      index = parseFieldTypeSignature(index, s, collector);
+    } catch (ParseException ignore) {
+      // Optional
+    }
+    while (index + 1 < s.length() && s.charAt(index + 1) == ':') {
+      throw new UnsupportedOperationException();
+    }
+    return index;
   }
 
   static int parseTypeSignature(int index, String s, List<String> collector) throws ParseException {
