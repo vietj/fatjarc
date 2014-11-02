@@ -154,12 +154,19 @@ public class SignatureParser {
   static int parseBaseType(int index, String s) throws ParseException {
     switch (s.charAt(index)) {
       case 'B':
+        return index + 1;
       case 'C':
+        return index + 1;
       case 'D':
+        return index + 1;
       case 'F':
+        return index + 1;
       case 'I':
+        return index + 1;
       case 'J':
+        return index + 1;
       case 'S':
+        return index + 1;
       case 'Z':
         return index + 1;
       default:

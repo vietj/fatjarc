@@ -43,6 +43,11 @@ public class FatJarTest extends TestBase {
   }
 
   @Test
+  public void testBaseTypeMethodParameter() throws Exception {
+    doTest("basetypemethodparameter");
+  }
+
+  @Test
   public void testQualifiedField() throws Exception {
     doTest("field.qualified", "basicclass.Foo");
     doTest("field.unqualified", "basicclass.Foo");
