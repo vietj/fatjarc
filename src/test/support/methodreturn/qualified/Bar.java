@@ -1,4 +1,4 @@
-package qualifiedmethodreturn;
+package methodreturn.qualified;
 
 import java.lang.UnsupportedOperationException;
 

@@ -1,4 +1,4 @@
-package unqualifiedconstructorparameter;
+package constructorparameter.unqualified;
 
 import basic.Foo;
 

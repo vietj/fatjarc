@@ -1,4 +1,4 @@
-package unqualifiedmethodreturn;
+package methodreturn.unqualified;
 
 import basic.Foo;
 

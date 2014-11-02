@@ -1,4 +1,4 @@
-package qualifiedconstructorparameter;
+package constructorparameter.qualified;
 
 public class Bar {
 

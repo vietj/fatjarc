@@ -23,17 +23,17 @@ public class FatJarTest extends TestBase {
 
   @Test
   public void testUnqualifiedField() throws Exception {
-    File classes = new File("target/unqualifiedfield/classes");
-    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("unqualifiedfield/Bar.java");
-    assertFile(new File(classes, "unqualifiedfield/Bar.class"));
+    File classes = new File("target/field/unqualified/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("field/unqualified/Bar.java");
+    assertFile(new File(classes, "field/unqualified/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
 
   @Test
   public void testQualifiedField() throws Exception {
-    File classes = new File("target/qualifiedfield/classes");
-    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("qualifiedfield/Bar.java");
-    assertFile(new File(classes, "qualifiedfield/Bar.class"));
+    File classes = new File("target/field/qualified/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("field/qualified/Bar.java");
+    assertFile(new File(classes, "field/qualified/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
 
@@ -47,49 +47,49 @@ public class FatJarTest extends TestBase {
 
   @Test
   public void testUnqualifiedMethodParameter() throws Exception {
-    File classes = new File("target/unqualifiedmethodparameter/classes");
-    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("unqualifiedmethodparameter/Bar.java");
-    assertFile(new File(classes, "unqualifiedmethodparameter/Bar.class"));
+    File classes = new File("target/methodparameter/unqualified/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("methodparameter/unqualified/Bar.java");
+    assertFile(new File(classes, "methodparameter/unqualified/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
 
   @Test
   public void testQualifiedMethodParameter() throws Exception {
-    File classes = new File("target/qualifiedmethodparameter/classes");
-    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("qualifiedmethodparameter/Bar.java");
-    assertFile(new File(classes, "qualifiedmethodparameter/Bar.class"));
+    File classes = new File("target/methodparameter/qualified/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("methodparameter/qualified/Bar.java");
+    assertFile(new File(classes, "methodparameter/qualified/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
 
   @Test
   public void testUnqualifiedMethodReturn() throws Exception {
-    File classes = new File("target/unqualifiedmethodreturn/classes");
-    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("unqualifiedmethodreturn/Bar.java");
-    assertFile(new File(classes, "unqualifiedmethodreturn/Bar.class"));
+    File classes = new File("target/methodreturn/unqualified/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("methodreturn/unqualified/Bar.java");
+    assertFile(new File(classes, "methodreturn/unqualified/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
 
   @Test
   public void testQualifiedMethodReturn() throws Exception {
-    File classes = new File("target/qualifiedmethodreturn/classes");
-    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("qualifiedmethodreturn/Bar.java");
-    assertFile(new File(classes, "qualifiedmethodreturn/Bar.class"));
+    File classes = new File("target/methodreturn/qualified/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("methodreturn/qualified/Bar.java");
+    assertFile(new File(classes, "methodreturn/qualified/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
 
   @Test
-  public void testUnqualifiedConstructorParam() throws Exception {
-    File classes = new File("target/unqualifiedconstructorparameter/classes");
-    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("unqualifiedconstructorparameter/Bar.java");
-    assertFile(new File(classes, "unqualifiedconstructorparameter/Bar.class"));
+  public void testUnqualifiedConstructorParameter() throws Exception {
+    File classes = new File("target/constructorparameter/unqualified/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("constructorparameter/unqualified/Bar.java");
+    assertFile(new File(classes, "constructorparameter/unqualified/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
 
   @Test
-  public void testQualifiedConstructorParam() throws Exception {
-    File classes = new File("target/qualifiedconstructorparameter/classes");
-    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("qualifiedconstructorparameter/Bar.java");
-    assertFile(new File(classes, "qualifiedconstructorparameter/Bar.class"));
+  public void testQualifiedConstructorParameter() throws Exception {
+    File classes = new File("target/constructorparameter/qualified/classes");
+    compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile("constructorparameter/qualified/Bar.java");
+    assertFile(new File(classes, "constructorparameter/qualified/Bar.class"));
     assertFile(new File(classes, "basic/Foo.class"));
   }
 

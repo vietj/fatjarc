@@ -1,4 +1,4 @@
-package unqualifiedfield;
+package field.unqualified;
 
 import basic.Foo;
 

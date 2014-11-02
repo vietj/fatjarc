@@ -1,4 +1,4 @@
-package qualifiedfield;
+package field.qualified;
 
 public class Bar {
 

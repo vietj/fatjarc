@@ -1,4 +1,4 @@
-package qualifiedmethodparameter;
+package methodparameter.qualified;
 
 public class Bar {
 

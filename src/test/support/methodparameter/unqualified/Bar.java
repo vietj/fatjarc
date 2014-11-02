@@ -1,4 +1,4 @@
-package unqualifiedmethodparameter;
+package methodparameter.unqualified;
 
 import basic.Foo;
 
