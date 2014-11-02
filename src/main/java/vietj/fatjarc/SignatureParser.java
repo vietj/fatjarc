@@ -8,39 +8,44 @@ import java.util.List;
 public class SignatureParser {
 
   static int parseMethodTypeSignature(String s, List<String> collector) throws ParseException {
-    if (s.startsWith("<")) {
-      return parseFormalTypeParameters(0, s, collector);
-    } else if (s.startsWith("(")) {
-      int index = 1;
-      while (s.charAt(index) != ')') {
-        index = parseTypeSignature(index, s, collector);
-      }
-      return index;
-    } else {
+    int index = 0;
+    try {
+      index = parseFormalTypeParameters(0, s, collector);
+    } catch (ParseException e) {
+      // Optional
+    }
+    if (s.charAt(index) != '(') {
       throw new AssertionError("parse error");
     }
+    index++;
+    while (s.charAt(index) != ')') {
+      index = parseTypeSignature(index, s, collector);
+    }
+    // Todo ReturnType and ThrowsSignature
+    return index;
   }
 
   static int parseFormalTypeParameters(int index, String s, List<String> collector) throws ParseException {
-    if (s.charAt(index++) != '<') {
-      throw new AssertionError("parse error");
+    if (index >= s.length() || s.charAt(index++) != '<') {
+      throw new ParseException();
     } else {
       while (s.charAt(index) != '>') {
         index = parseFormalTypeParameter(index, s, collector);
       }
-      return index;
+      return index + 1;
     }
   }
 
   static int parseFormalTypeParameter(int index, String s, List<String> collector) throws ParseException {
-    index = s.indexOf(':', index) + 1;
+    index = s.indexOf(':', index);
     try {
-      index = parseFieldTypeSignature(index, s, collector);
+      index = parseFieldTypeSignature(index + 1, s, collector);
     } catch (ParseException ignore) {
       // Optional
+      index++;
     }
-    while (index + 1 < s.length() && s.charAt(index + 1) == ':') {
-      throw new UnsupportedOperationException();
+    while (index< s.length() && s.charAt(index) == ':') {
+      index = parseFieldTypeSignature(index + 1, s, collector);
     }
     return index;
   }
@@ -70,7 +75,7 @@ public class SignatureParser {
 
   static int parseTypeVariableSignature(int index, String s) throws ParseException {
     if (s.charAt(index) == 'T') {
-      throw new UnsupportedOperationException();
+      return s.indexOf(';', index + 1) + 1;
     } else {
       throw new ParseException();
     }
