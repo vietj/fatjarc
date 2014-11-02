@@ -57,6 +57,18 @@ public class FatJarTest extends TestBase {
     doTest("argumentofparameterizedmethodparameter/unqualified");
   }
 
+  @Test
+  public void testUpperBoundOfParameterizedMethodParameter() throws Exception {
+    doTest("upperboundofparameterizedmethodparameter/qualified");
+    doTest("upperboundofparameterizedmethodparameter/unqualified");
+  }
+
+  @Test
+  public void testLowerBoundOfParameterizedMethodParameter() throws Exception {
+    doTest("lowerboundofparameterizedmethodparameter/qualified");
+    doTest("lowerboundofparameterizedmethodparameter/unqualified");
+  }
+
   private void doTest(String relativePath) throws IOException {
     File classes = new File("target/" + relativePath + "/classes");
     compiler(classes).addToClassPath(basicJar).addProcessor(new FatJarProcessor()).assertCompile(relativePath + "/Bar.java");
