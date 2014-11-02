@@ -1,6 +1,6 @@
 package methodreturn.unqualified;
 
-import basic.Foo;
+import basicclass.Foo;
 
 import java.lang.UnsupportedOperationException;
 

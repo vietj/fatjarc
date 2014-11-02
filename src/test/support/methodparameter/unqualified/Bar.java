@@ -1,6 +1,6 @@
 package methodparameter.unqualified;
 
-import basic.Foo;
+import basicclass.Foo;
 
 public class Bar {
 

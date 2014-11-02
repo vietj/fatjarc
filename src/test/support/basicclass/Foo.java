@@ -1,4 +1,4 @@
-package basic;
+package basicclass;
 
 public class Foo {
 }

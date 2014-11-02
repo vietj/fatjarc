@@ -1,7 +1,7 @@
 package argumentofparameterizedmethodparameter.unqualified;
 
 import java.util.List;
-import basic.Foo;
+import basicclass.Foo;
 
 public class Bar {
 

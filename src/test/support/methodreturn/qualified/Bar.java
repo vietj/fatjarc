@@ -4,7 +4,7 @@ import java.lang.UnsupportedOperationException;
 
 public class Bar {
 
-  public basic.Foo m() {
+  public basicclass.Foo m() {
     throw new UnsupportedOperationException();
   }
 }

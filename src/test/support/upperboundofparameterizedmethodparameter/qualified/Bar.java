@@ -4,6 +4,6 @@ import java.util.List;
 
 public class Bar {
 
-  public void m(List<? extends basic.Foo> foo) {
+  public void m(List<? extends basicclass.Foo> foo) {
   }
 }

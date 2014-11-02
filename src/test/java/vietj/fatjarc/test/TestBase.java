@@ -22,7 +22,7 @@ public class TestBase {
     return new Compiler(dst);
   }
 
-  static void makeJar(File src, File dst) {
+  static void jar(File src, File dst) {
     if (dst.exists()) {
       throw new AssertionError("Dst file already exists " + dst.getAbsolutePath());
     }
