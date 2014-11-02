@@ -38,73 +38,73 @@ public class FatJarTest extends TestBase {
   }
 
   @Test
-  public void testClassLiteral() throws Exception {
-    doTest("classliteral", "basicclass.Foo");
+  public void testDescriptorClassLiteral() throws Exception {
+    doTest("descriptor.classliteral", "basicclass.Foo");
   }
 
   @Test
-  public void testBaseTypeMethodParameter() throws Exception {
-    doTest("basetypemethodparameter");
+  public void testDescriptorQualifiedField() throws Exception {
+    doTest("descriptor.field.qualified", "basicclass.Foo");
+    doTest("descriptor.field.unqualified", "basicclass.Foo");
   }
 
   @Test
-  public void testQualifiedField() throws Exception {
-    doTest("field.qualified", "basicclass.Foo");
-    doTest("field.unqualified", "basicclass.Foo");
+  public void testDescriptorMethodParameter() throws Exception {
+    doTest("descriptor.methodparameter.qualified", "basicclass.Foo");
+    doTest("descriptor.methodparameter.unqualified", "basicclass.Foo");
   }
 
   @Test
-  public void testMethodParameter() throws Exception {
-    doTest("methodparameter.qualified", "basicclass.Foo");
-    doTest("methodparameter.unqualified", "basicclass.Foo");
+  public void testDescriptorMethodReturn() throws Exception {
+    doTest("descriptor.methodreturn.qualified", "basicclass.Foo");
+    doTest("descriptor.methodreturn.unqualified", "basicclass.Foo");
   }
 
   @Test
-  public void testMethodReturn() throws Exception {
-    doTest("methodreturn.qualified", "basicclass.Foo");
-    doTest("methodreturn.unqualified", "basicclass.Foo");
+  public void testDescriptorConstructorParameter() throws Exception {
+    doTest("descriptor.constructorparameter.qualified", "basicclass.Foo");
+    doTest("descriptor.constructorparameter.unqualified", "basicclass.Foo");
   }
 
   @Test
-  public void testConstructorParameter() throws Exception {
-    doTest("constructorparameter.qualified", "basicclass.Foo");
-    doTest("constructorparameter.unqualified", "basicclass.Foo");
+  public void testSignatureBaseTypeMethodParameter() throws Exception {
+    doTest("signature.basetypemethodparameter");
   }
 
   @Test
-  public void testArgumentOfParameterizedMethodParameter() throws Exception {
-    doTest("argumentofparameterizedmethodparameter.qualified", "basicclass.Foo");
-    doTest("argumentofparameterizedmethodparameter.unqualified", "basicclass.Foo");
+  public void testSignatureArgumentOfParameterizedMethodParameter() throws Exception {
+    doTest("signature.argumentofparameterizedmethodparameter.qualified", "basicclass.Foo");
+    doTest("signature.argumentofparameterizedmethodparameter.unqualified", "basicclass.Foo");
   }
 
   @Test
-  public void testUpperBoundOfParameterizedMethodParameter() throws Exception {
-    doTest("upperboundofparameterizedmethodparameter.qualified", "basicclass.Foo");
-    doTest("upperboundofparameterizedmethodparameter.unqualified", "basicclass.Foo");
+  public void testSignatureUpperBoundOfParameterizedMethodParameter() throws Exception {
+    doTest("signature.upperboundofparameterizedmethodparameter.qualified", "basicclass.Foo");
+    doTest("signature.upperboundofparameterizedmethodparameter.unqualified", "basicclass.Foo");
   }
 
   @Test
-  public void testLowerBoundOfParameterizedMethodParameter() throws Exception {
-    doTest("lowerboundofparameterizedmethodparameter.qualified", "basicclass.Foo");
-    doTest("lowerboundofparameterizedmethodparameter.unqualified", "basicclass.Foo");
+  public void testSignatureLowerBoundOfParameterizedMethodParameter() throws Exception {
+    doTest("signature.lowerboundofparameterizedmethodparameter.qualified", "basicclass.Foo");
+    doTest("signature.lowerboundofparameterizedmethodparameter.unqualified", "basicclass.Foo");
   }
 
   @Test
-  public void testClassUpperBoundOfMethodTypeParameter() throws Exception {
-    doTest("classupperboundofmethodtypeparameter.qualified", "basicclass.Foo");
-    doTest("classupperboundofmethodtypeparameter.unqualified", "basicclass.Foo");
+  public void testSignatureClassUpperBoundOfMethodTypeParameter() throws Exception {
+    doTest("signature.classupperboundofmethodtypeparameter.qualified", "basicclass.Foo");
+    doTest("signature.classupperboundofmethodtypeparameter.unqualified", "basicclass.Foo");
   }
 
   @Test
-  public void testInterfaceUpperBoundOfMethodTypeParameter() throws Exception {
-    doTest("interfaceupperboundofmethodtypeparameter.qualified", "basicinterface.Juu");
-    doTest("interfaceupperboundofmethodtypeparameter.unqualified", "basicinterface.Juu");
+  public void testSignatureInterfaceUpperBoundOfMethodTypeParameter() throws Exception {
+    doTest("signature.interfaceupperboundofmethodtypeparameter.qualified", "basicinterface.Juu");
+    doTest("signature.interfaceupperboundofmethodtypeparameter.unqualified", "basicinterface.Juu");
   }
 
   @Test
-  public void testClassAndInterfaceUpperBoundOfMethodTypeParameter() throws Exception {
-    doTest("classandinterfaceupperboundofmethodtypeparameter.qualified", "basicclass.Foo", "basicinterface.Juu");
-    doTest("classandinterfaceupperboundofmethodtypeparameter.unqualified", "basicclass.Foo", "basicinterface.Juu");
+  public void testSignatureClassAndInterfaceUpperBoundOfMethodTypeParameter() throws Exception {
+    doTest("signature.classandinterfaceupperboundofmethodtypeparameter.qualified", "basicclass.Foo", "basicinterface.Juu");
+    doTest("signature.classandinterfaceupperboundofmethodtypeparameter.unqualified", "basicclass.Foo", "basicinterface.Juu");
   }
 
   private void doTest(String pkg, String... expected) throws IOException {
