@@ -204,22 +204,6 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
     }
   }
 
-  static int readDescriptor(String typeDesc, int from, List<String> collector) {
-    switch (typeDesc.charAt(from)) {
-      case 'L': {
-        int to = typeDesc.indexOf(';', from);
-        String fqn = typeDesc.substring(from + 1, to).replace('/', '.');
-        collector.add(fqn);
-        return to + 1;
-      }
-      case '[': {
-        return readDescriptor(typeDesc, from + 1, collector);
-      }
-      default:
-        return from + 1;
-    }
-  }
-
   static List<String> foo(InputStream _in) throws IOException {
 
     List<String> names = new ArrayList<>();
@@ -284,11 +268,7 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
     }
     for (int classReference : refs) {
       String ref = strings[classReference];
-      if (ref.charAt(0) == '[') {
-        readDescriptor(ref, 0, names);
-      } else {
-        names.add(ref.replace('/', '.'));
-      }
+      names.add(ref.replace('/', '.'));
     }
     in.readUnsignedShort(); // access_flags
     in.readUnsignedShort(); // this_class
@@ -302,7 +282,7 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
       in.readUnsignedShort(); // access_flags
       in.readUnsignedShort(); // name_index
       int descriptor_index = in.readUnsignedShort(); // descriptor_index
-      readDescriptor(strings[descriptor_index], 0, names);
+      DescriptorParser.parseFieldDescriptor(strings[descriptor_index], names);
       readAttributes(strings, in, s -> {
         throw new UnsupportedOperationException("todo");
       });
@@ -312,12 +292,7 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
       in.readUnsignedShort(); // access_flags
       in.readUnsignedShort(); // name_index
       int descriptor_index = in.readUnsignedShort(); // descriptor_index
-      String ss = strings[descriptor_index];
-      int j = 1;
-      while (ss.charAt(j) != ')') {
-        j = readDescriptor(ss, j, names);
-      }
-      readDescriptor(ss, j + 1, names);
+      DescriptorParser.parseMethodDescriptor(strings[descriptor_index], names);
       readAttributes(strings, in, signature -> SignatureParser.parseMethodTypeSignature(signature, names));
     }
 
