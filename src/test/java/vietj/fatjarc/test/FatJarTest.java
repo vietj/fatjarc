@@ -134,6 +134,24 @@ public class FatJarTest extends TestBase {
     doTest("signature.classandinterfaceupperboundofmethodtypeparameter.unqualified", "basicclass.Foo", "basicinterface.Juu");
   }
 
+  @Test
+  public void testClassUpperBoundOfClassTypeParameter() throws Exception {
+    doTest("signature.classupperboundofclasstypeparameter.qualified", "basicclass.Foo");
+    doTest("signature.classupperboundofclasstypeparameter.unqualified", "basicclass.Foo");
+  }
+
+  @Test
+  public void testInterfaceUpperBoundOfClassTypeParameter() throws Exception {
+    doTest("signature.interfaceupperboundofclasstypeparameter.qualified", "basicinterface.Juu");
+    doTest("signature.interfaceupperboundofclasstypeparameter.unqualified", "basicinterface.Juu");
+  }
+
+  @Test
+  public void testClassAndInterfaceUpperBoundOfClassTypeParameter() throws Exception {
+    doTest("signature.classandinterfaceupperboundofclasstypeparameter.qualified", "basicclass.Foo", "basicinterface.Juu");
+    doTest("signature.classandinterfaceupperboundofclasstypeparameter.unqualified", "basicclass.Foo", "basicinterface.Juu");
+  }
+
   private void doTest(String pkg, String... expected) throws IOException {
     String relativePath = pkg.replace('.', '/');
     File classes = new File("target/" + relativePath + "/classes");

@@ -295,6 +295,8 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
       DescriptorParser.parseMethodDescriptor(strings[descriptor_index], names);
       readAttributes(strings, in, signature -> SignatureParser.parseMethodTypeSignature(signature, names));
     }
+    readAttributes(strings, in, signature -> SignatureParser.parseClassSignature(signature, names));
+
 
     //
     return names;

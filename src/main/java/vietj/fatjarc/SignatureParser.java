@@ -15,6 +15,31 @@ public class SignatureParser {
     parseMethodTypeSignature(0, s, collector);
   }
 
+  static void parseClassSignature(String s, List<String> collector) throws ParseException {
+    parseClassSignature(0, s, collector);
+  }
+
+  static int parseClassSignature(int index, String s, List<String> collector) throws ParseException {
+    try {
+      index = parseFormalTypeParameters(index, s, collector);
+    } catch (ParseException e) {
+      // Optional
+    }
+    index = parseSuperclassSignature(index, s, collector);
+    while (index < s.length()) {
+      index = parseSuperinterfaceSignature(index, s, collector);
+    }
+    return index;
+  }
+
+  static int parseSuperclassSignature(int index, String s, List<String> collector) throws ParseException {
+    return parseClassTypeSignature(index, s, collector);
+  }
+
+  static int parseSuperinterfaceSignature(int index, String s, List<String> collector) throws ParseException {
+    return parseClassTypeSignature(index, s, collector);
+  }
+
   static int parseMethodTypeSignature(int index, String s, List<String> collector) throws ParseException {
     try {
       index = parseFormalTypeParameters(0, s, collector);
