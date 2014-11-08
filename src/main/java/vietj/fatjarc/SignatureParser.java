@@ -97,12 +97,14 @@ public class SignatureParser {
           case '<':
             next = parseTypeArguments(next, s, collector);
             if (next + 1 < s.length() && s.charAt(next + 1) == '.') {
-              throw new UnsupportedOperationException("ClassTypeSignatureSuffix");
+              next = parseClassTypeSignatureSuffix(next, s, collector);
+              break;
             } else {
               break out;
             }
           case '.':
-            throw new UnsupportedOperationException("ClassTypeSignatureSuffix");
+            next = parseClassTypeSignatureSuffix(next, s, collector);
+            break;
           case ';':
             // Parse type
             break out;
@@ -115,6 +117,10 @@ public class SignatureParser {
     } else {
       throw new ParseException();
     }
+  }
+
+  static int parseClassTypeSignatureSuffix(int index, String s, List<String> collector) throws ParseException {
+    throw new UnsupportedOperationException("todo");
   }
 
   static int parseTypeArguments(int index, String s, List<String> collector) throws ParseException {
