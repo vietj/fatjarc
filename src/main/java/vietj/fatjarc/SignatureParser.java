@@ -66,7 +66,7 @@ public class SignatureParser {
       // Alternative
     }
     try {
-      return parseArrayTypeSignature(index, s);
+      return parseArrayTypeSignature(index, s, collector);
     } catch (ParseException ignore) {
       // Alternative
     }
@@ -81,9 +81,9 @@ public class SignatureParser {
     }
   }
 
-  static int parseArrayTypeSignature(int index, String s) throws ParseException {
+  static int parseArrayTypeSignature(int index, String s, List<String> collector) throws ParseException {
     if (s.charAt(index) == '[') {
-      throw new UnsupportedOperationException();
+      return parseTypeSignature(index + 1, s, collector);
     }
     throw new ParseException();
   }

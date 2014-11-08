@@ -67,8 +67,19 @@ public class FatJarTest extends TestBase {
   }
 
   @Test
-  public void testSignatureBaseTypeMethodParameter() throws Exception {
-    doTest("signature.basetypemethodparameter");
+  public void testSignatureBaseMethodParameter() throws Exception {
+    doTest("signature.basemethodparameter");
+  }
+
+  @Test
+  public void testSignatureBaseComponentOfArrayMethodParameter() throws Exception {
+    doTest("signature.basecomponentofarraymethodparameter");
+  }
+
+  @Test
+  public void testSignatureComponentOfArrayMethodParameter() throws Exception {
+    doTest("signature.componentofarraymethodparameter.qualified", "basicclass.Foo");
+    doTest("signature.componentofarraymethodparameter.unqualified", "basicclass.Foo");
   }
 
   @Test

@@ -1,4 +1,4 @@
-package signature.basetypemethodparameter;
+package signature.basemethodparameter;
 
 import java.util.List;
 
