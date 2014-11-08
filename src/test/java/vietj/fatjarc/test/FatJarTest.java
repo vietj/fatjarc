@@ -94,6 +94,12 @@ public class FatJarTest extends TestBase {
   }
 
   @Test
+  public void testSignatureArgumentOfParameterizedField() throws Exception {
+    doTest("signature.argumentofparameterizedfield.qualified", "basicclass.Foo");
+    doTest("signature.argumentofparameterizedfield.unqualified", "basicclass.Foo");
+  }
+
+  @Test
   public void testSignatureUnboundedParameterizedMethodParameter() throws Exception {
     doTest("signature.unboundedparameterizedmethodparameter");
   }

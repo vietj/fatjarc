@@ -283,8 +283,8 @@ public class FatJarProcessor extends AbstractProcessor implements TaskListener {
       in.readUnsignedShort(); // name_index
       int descriptor_index = in.readUnsignedShort(); // descriptor_index
       DescriptorParser.parseFieldDescriptor(strings[descriptor_index], names);
-      readAttributes(strings, in, s -> {
-        throw new UnsupportedOperationException("todo");
+      readAttributes(strings, in, signature -> {
+        SignatureParser.parseFieldTypeSignature(signature, names);
       });
     }
     int methods_count = in.readUnsignedShort(); // methods_count

@@ -7,8 +7,15 @@ import java.util.List;
  */
 public class SignatureParser {
 
-  static int parseMethodTypeSignature(String s, List<String> collector) throws ParseException {
-    int index = 0;
+  static void parseFieldTypeSignature(String s, List<String> collector) throws ParseException {
+    parseFieldTypeSignature(0, s, collector);
+  }
+
+  static void parseMethodTypeSignature(String s, List<String> collector) throws ParseException {
+    parseMethodTypeSignature(0, s, collector);
+  }
+
+  static int parseMethodTypeSignature(int index, String s, List<String> collector) throws ParseException {
     try {
       index = parseFormalTypeParameters(0, s, collector);
     } catch (ParseException e) {
