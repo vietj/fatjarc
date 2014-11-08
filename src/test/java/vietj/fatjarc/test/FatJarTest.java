@@ -43,6 +43,11 @@ public class FatJarTest extends TestBase {
   }
 
   @Test
+  public void testDescriptorBaseField() throws Exception {
+    doTest("descriptor.basefield");
+  }
+
+  @Test
   public void testDescriptorQualifiedField() throws Exception {
     doTest("descriptor.field.qualified", "basicclass.Foo");
     doTest("descriptor.field.unqualified", "basicclass.Foo");
