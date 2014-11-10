@@ -68,8 +68,19 @@ public class SignatureParser {
     }
   }
 
+  private static boolean isIdentifierDelimiter(char c) {
+    return c != '.' && c != ';' && c != '[' && c != '/' && c != '<' && c != '>' && c != ':';
+  }
+
+  static int parseIdentifier(int index, String s) {
+    while (index < s.length() && isIdentifierDelimiter(s.charAt(index))) {
+      index++;
+    }
+    return index;
+  }
+
   static int parseFormalTypeParameter(int index, String s, List<String> collector) throws ParseException {
-    index = s.indexOf(':', index);
+    index = parseIdentifier(index, s);
     try {
       index = parseFieldTypeSignature(index + 1, s, collector);
     } catch (ParseException ignore) {
@@ -107,7 +118,11 @@ public class SignatureParser {
 
   static int parseTypeVariableSignature(int index, String s) throws ParseException {
     if (s.charAt(index) == 'T') {
-      return s.indexOf(';', index + 1) + 1;
+      index = parseIdentifier(index + 1, s);
+      if (s.charAt(index) != ';') {
+        throw new AssertionError();
+      }
+      return index + 1;
     } else {
       throw new ParseException();
     }
@@ -122,42 +137,60 @@ public class SignatureParser {
 
   static int parseClassTypeSignature(int index, String s, List<String> collector) throws ParseException {
     if (s.charAt(index) == 'L') {
-      int next = index;
-      out:
-      while (true) {
-        switch (s.charAt(next)) {
-          case '<':
-            next = parseTypeArguments(next, s, collector);
-            if (next + 1 < s.length() && s.charAt(next + 1) == '.') {
-              next = parseClassTypeSignatureSuffix(next, s, collector);
-              break;
-            } else {
-              break out;
-            }
-          case '.':
-            next = parseClassTypeSignatureSuffix(next, s, collector);
-            break;
-          case ';':
-            // Parse type
-            break out;
-          default:
-            next++;
-        }
+      int from = index + 1;
+      try {
+        index = parsePackageSpecifier(index, s);
+      } catch (ParseException e) {
+        // Opt
       }
-      collector.add(s.substring(index + 1, next).replace('/', '.'));
-      return next + 1;
+      index = parseSimpleClassTypeSignature(index, s, collector);
+      int to = index;
+      while (s.charAt(index) != ';') {
+        index = parseClassTypeSignatureSuffix(index, s, collector);
+      }
+      collector.add(s.substring(from, to).replace('/', '.'));
+      return index + 1;
     } else {
       throw new ParseException();
     }
   }
 
+  static int parseSimpleClassTypeSignature(int index, String s, List<String> collector) {
+    index = parseIdentifier(index, s);
+    try {
+      index = parseTypeArguments(index, s, collector);
+    } catch (ParseException e) {
+      // Opt
+    }
+    return index;
+  }
+
+  static int parsePackageSpecifier(int index, String s) throws ParseException {
+    index = parseIdentifier(index, s);
+    if (s.charAt(index) != '/') {
+      throw new ParseException();
+    }
+    index++;
+    while (true) {
+      try {
+        index = parsePackageSpecifier(index, s);
+      } catch (ParseException e) {
+        // *
+        return index;
+      }
+    }
+  }
+
   static int parseClassTypeSignatureSuffix(int index, String s, List<String> collector) throws ParseException {
-    throw new UnsupportedOperationException("todo");
+    if (s.charAt(index) != '.') {
+      throw new ParseException();
+    }
+    return parseSimpleClassTypeSignature(index + 1, s, collector);
   }
 
   static int parseTypeArguments(int index, String s, List<String> collector) throws ParseException {
     if (s.charAt(index++) != '<') {
-      throw new AssertionError("parse error");
+      throw new ParseException();
     } else {
       while (s.charAt(index) != '>') {
         index = parseTypeArgument(index, s, collector);
