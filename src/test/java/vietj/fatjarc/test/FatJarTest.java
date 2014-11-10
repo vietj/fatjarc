@@ -24,6 +24,7 @@ public class FatJarTest extends TestBase {
   private static File basicInterfaceJar;
   private static File basicInnerClassJar;
   private static File basicGenericOuterClassJar;
+  private static File basicGenericInnerClassJar;
 
   @BeforeClass
   public static void compileBasic() throws Exception {
@@ -31,6 +32,7 @@ public class FatJarTest extends TestBase {
     basicInterfaceJar = buildJar("target/basicinterface", "target/basicinterface.jar", "basicinterface/Juu.java");
     basicInnerClassJar = buildJar("target/basicinnerclass", "target/basicinnerclass.jar", "basicinnerclass/Daa.java");
     basicGenericOuterClassJar = buildJar("target/basicgenericouterclass", "target/basicgenericouterclass.jar", "basicgenericouterclass/Daa.java");
+    basicGenericInnerClassJar = buildJar("target/basicgenericinnerclass", "target/basicgenericinnerclass.jar", "basicgenericinnerclass/Daa.java");
   }
 
   private static File buildJar(String src, String dst, String... classes) throws Exception {
@@ -192,6 +194,12 @@ public class FatJarTest extends TestBase {
     doTest("signature.genericouterclass.unqualified", "basicgenericouterclass/Daa", "basicgenericouterclass/Daa$Inner");
   }
 
+  @Test
+  public void testGenericInnerClass() throws Exception {
+    doTest("signature.genericinnerclass.qualified", "basicgenericinnerclass/Daa", "basicgenericinnerclass/Daa$InnerOuter", "basicgenericinnerclass/Daa$InnerOuter$Inner");
+    doTest("signature.genericinnerclass.unqualified", "basicgenericinnerclass/Daa", "basicgenericinnerclass/Daa$InnerOuter", "basicgenericinnerclass/Daa$InnerOuter$Inner");
+  }
+
   private void doTest(String pkg, String... expected) throws IOException {
     String relativePath = pkg.replace('.', '/');
     File classes = new File("target/" + relativePath + "/classes");
@@ -200,6 +208,7 @@ public class FatJarTest extends TestBase {
         addToClassPath(basicInterfaceJar).
         addToClassPath(basicInnerClassJar).
         addToClassPath(basicGenericOuterClassJar).
+        addToClassPath(basicGenericInnerClassJar).
         addProcessor(new FatJarProcessor()).assertCompile(relativePath + "/Bar.java");
     HashSet<File> expectedFiles = new HashSet<>();
     expectedFiles.add(new File(classes, relativePath + "/Bar.class"));
