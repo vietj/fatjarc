@@ -200,6 +200,18 @@ public class FatJarTest extends TestBase {
     doTest("signature.genericinnerclass.unqualified", "basicgenericinnerclass/Daa", "basicgenericinnerclass/Daa$InnerOuter", "basicgenericinnerclass/Daa$InnerOuter$Inner");
   }
 
+  @Test
+  public void testArgumentOfOuterClass() throws Exception {
+    doTest("signature.argumentofparameterizedouterclass.qualified", "basicgenericouterclass.Daa", "basicgenericouterclass.Daa$Inner", "basicclass.Foo");
+    doTest("signature.argumentofparameterizedouterclass.unqualified", "basicgenericouterclass.Daa", "basicgenericouterclass.Daa$Inner", "basicclass.Foo");
+  }
+
+  @Test
+  public void testArgumentOfInnerClass() throws Exception {
+    doTest("signature.argumentofparameterizedinnerclass.qualified", "basicgenericinnerclass.Daa", "basicgenericinnerclass.Daa$InnerOuter", "basicgenericinnerclass.Daa$InnerOuter$Inner","basicclass.Foo");
+    doTest("signature.argumentofparameterizedinnerclass.unqualified", "basicgenericinnerclass.Daa", "basicgenericinnerclass.Daa$InnerOuter", "basicgenericinnerclass.Daa$InnerOuter$Inner","basicclass.Foo");
+  }
+
   private void doTest(String pkg, String... expected) throws IOException {
     String relativePath = pkg.replace('.', '/');
     File classes = new File("target/" + relativePath + "/classes");
