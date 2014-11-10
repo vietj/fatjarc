@@ -1,6 +1,6 @@
 package signature.genericouterclass.unqualified;
 
-import basicgenericinnerclass.Daa;
+import basicgenericouterclass.Daa;
 
 public class Bar {
 

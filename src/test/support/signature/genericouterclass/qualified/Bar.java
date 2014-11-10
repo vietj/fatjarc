@@ -2,6 +2,6 @@ package signature.genericouterclass.qualified;
 
 public class Bar {
 
-  public basicgenericinnerclass.Daa<String>.Inner field;
+  public basicgenericouterclass.Daa<String>.Inner field;
 
 }
